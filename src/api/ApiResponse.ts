@@ -1,44 +1,28 @@
-import type {AxiosError} from "axios";
-
-interface ApiError {
-    status: number;
-    code: string;
-    message: string;
-    details: unknown;
-}
+import axios, {type AxiosError} from "axios";
+import type {ApiError} from "../utils/types.ts";
 
 class ApiResponse {
     public success: boolean;
-    public payload: unknown;
-    public error: ApiError | null;
+    public payload: any;
+    public error: ApiError;
 
-    private constructor(success: boolean, payload: unknown, error: ApiError | AxiosError | null) {
+    private constructor(success: boolean, payload: any, error: AxiosError | any) {
         this.success = success;
         this.payload = payload;
-        this.error = error ? ApiResponse.normalizeError(error) : null;
+        this.error = axios.isAxiosError(error) ? {
+            status: error?.response?.status ?? 0,
+            code: error?.response?.data?.code ?? "NO_CODE",
+            message: error?.response?.data?.message ?? "Something Went Wrong",
+            details: error?.response?.data?.details
+        } : error;
     }
 
-    static success(data: unknown): ApiResponse {
+    static success(data: any): ApiResponse {
         return new ApiResponse(true, data, null);
     }
 
     static error(error: ApiError | AxiosError): ApiResponse {
         return new ApiResponse(false, null, error);
-    }
-
-    private static normalizeError(error: ApiError | AxiosError): ApiError {
-        if ("response" in error) {
-            const responseData = error.response?.data as Partial<ApiError> | undefined;
-
-            return {
-                status: error.status ?? error.response?.status ?? 0,
-                code: responseData?.code ?? "NO CODE",
-                message: responseData?.message ?? "Unknown Error",
-                details: responseData?.details ?? {},
-            };
-        }
-
-        return error as ApiError;
     }
 }
 

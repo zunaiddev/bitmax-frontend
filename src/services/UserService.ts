@@ -1,6 +1,5 @@
 import ApiResponse from "../api/ApiResponse.ts";
 import {publicApi} from "../api/api.ts";
-import axios from "axios";
 import getToken from "../utils/getToken.ts";
 
 class UserService {
@@ -35,16 +34,8 @@ class UserService {
                 },
             });
             return ApiResponse.success(response.data);
-        } catch (err) {
-            if (axios.isAxiosError(err)) {
-                return ApiResponse.error(err);
-            }
-            return ApiResponse.error({
-                status: 0,
-                code: "UNKNOWN_ERROR",
-                message: err instanceof Error ? err.message : "Unknown Error",
-                details: err,
-            });
+        } catch (err: any) {
+            return ApiResponse.error(err);
         }
     }
 }

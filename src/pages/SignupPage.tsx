@@ -69,6 +69,7 @@ function SignupPage(): JSX.Element {
                     autoComplete="name"
                     register={register('name', {
                         required: 'Name is required',
+                        pattern: {value: /^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ' \-]+$/, message: "Enter a valid name"}
                     })}
                     error={errors.name}
                 />
@@ -80,7 +81,7 @@ function SignupPage(): JSX.Element {
                     register={register('email', {
                         required: 'Email is required',
                         pattern: {
-                            value: /^\S+@\S+\.\S+$/,
+                            value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
                             message: 'Enter a valid email address',
                         },
                     })}
@@ -93,6 +94,10 @@ function SignupPage(): JSX.Element {
                     autoComplete="tel"
                     register={register('phone', {
                         required: 'Phone number is required',
+                        pattern: {
+                            value: /^\+?[0-9]{10,15}$/,
+                            message: "Enter a valid phone number"
+                        },
                         minLength: {
                             value: 8,
                             message: 'Phone number is too short',
@@ -106,6 +111,10 @@ function SignupPage(): JSX.Element {
                     autoComplete="new-password"
                     register={register('password', {
                         required: 'Password is required',
+                        pattern: {
+                            value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^\w\s]).{8,}$/,
+                            message: "Please use a strong password"
+                        },
                         minLength: {
                             value: 6,
                             message: 'Password must be at least 6 characters',

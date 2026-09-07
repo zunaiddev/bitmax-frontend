@@ -59,7 +59,7 @@ function DashboardPage(): JSX.Element | null {
             className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.18),transparent_35%),linear-gradient(180deg,#050816_0%,#02050d_100%)] px-4 py-10 flex items-center justify-center text-white">
             <div className="mx-auto flex w-full h-full gap-5 flex-col">
                 {loading ? <><ProfileDetailsSkeleton/> <UserSessionsSkeleton/></> : <>
-                    <UserCard email={user?.email} phone={user?.phone} createdAt={user?.createdAt}/>
+                    <UserCard name={user?.name} email={user?.email} phone={user?.phone} createdAt={user?.createdAt}/>
                     <SessionsCard sessions={sessions} deleteSession={removeSession}/>
                 </>}
             </div>

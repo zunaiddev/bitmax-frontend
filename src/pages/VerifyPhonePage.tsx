@@ -64,8 +64,8 @@ function VerifyPhonePage() {
     }
 
     return (<AuthFormContainer
-        title="Verify Email OTP"
-        subtitle={`Enter the 4-digit code sent to ${phone}`}
+        title="Verify Phone OTP"
+        subtitle={`Enter the 4-digit code sent to +91 ${phone}`}
         footerText="Alredy Verified"
         footerLinkText="login"
         footerLinkTo="/auth/login"

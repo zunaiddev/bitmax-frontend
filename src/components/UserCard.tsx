@@ -1,14 +1,16 @@
 import {type JSX, useState} from "react";
 import UserService from "../services/UserService.ts";
 import {useNavigate} from "react-router-dom";
+import normalizeDate from "../utils/normlizeDate.ts";
 
 interface Props {
+    name: string;
     email: string;
     phone: string;
     createdAt: string;
 }
 
-function UserCard({email, phone, createdAt}: Props): JSX.Element {
+function UserCard({name, email, phone, createdAt}: Props): JSX.Element {
     const [loggingOut, setLoggingOut] = useState(false);
     const navigate = useNavigate();
 
@@ -54,9 +56,10 @@ function UserCard({email, phone, createdAt}: Props): JSX.Element {
         </div>
 
         <div className="space-y-4">
+            <InfoRow label="Name" value={name}/>
             <InfoRow label="Email" value={email}/>
             <InfoRow label="Phone number" value={phone}/>
-            <InfoRow label="Account created" value={createdAt}/>
+            <InfoRow label="Account created" value={normalizeDate(createdAt)}/>
         </div>
     </section>);
 }

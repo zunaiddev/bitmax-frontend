@@ -3,7 +3,6 @@ import RootLayout from '../layout/RootLayout'
 import AuthLayout from '../layout/AuthLayout.tsx'
 import LoginPage from '../pages/LoginPage'
 import SignupPage from '../pages/SignupPage'
-import OtpVerificationPage from '../pages/OtpVerificationPage'
 import ForgotPasswordPage from "../pages/ForgotPasswordPage.tsx";
 import DashboardPage from "../pages/DashboardPage.tsx";
 import VerifyEmailPage from "../pages/VerifyEmailPage.tsx";
@@ -21,7 +20,6 @@ const router = createBrowserRouter([
                     {index: true, element: <Navigate to="login" replace/>},
                     {path: 'login', element: <LoginPage/>},
                     {path: 'signup', element: <SignupPage/>},
-                    {path: 'otp', element: <OtpVerificationPage/>},
                     {path: 'verify-email', element: <VerifyEmailPage/>},
                     {path: 'verify-phone', element: <VerifyPhonePage/>},
                     {path: "forgot-password", element: <ForgotPasswordPage/>}
