@@ -3,8 +3,13 @@ import {useForm} from 'react-hook-form';
 import AuthFormContainer from "../components/AuthFormContainer.tsx";
 import InputField from "../components/InputField.tsx";
 import Button from "../fields/Button.tsx";
+import AuthService from "../services/AuthService.ts";
+import {useNavigate} from "react-router-dom";
+import {HttpStatusCode} from "axios";
+import toast from "react-hot-toast";
 
 interface SignupFormValues {
+    name: string,
     email: string;
     phone: string;
     password: string;
@@ -15,17 +20,38 @@ function SignupPage(): JSX.Element {
         register,
         handleSubmit,
         formState: {errors, isSubmitting},
+        setError,
     } = useForm<SignupFormValues>({
         defaultValues: {
-            email: '',
-            phone: '',
-            password: '',
-        },
-        mode: 'onTouched',
+            name: 'John',
+            email: 'john@gmail.com',
+            phone: '9690578859',
+            password: 'John@123',
+        }
     });
+    const navigate = useNavigate();
 
     const onSubmit = handleSubmit(async (data) => {
         console.log('signup', data);
+        const {success, error} = await AuthService.signup(data.name, data.email, data.phone, data.password);
+
+        if (success) {
+            navigate(`/auth/verify-email?email=${data.email}&skip=true`);
+            return;
+        }
+
+        if (error?.status === HttpStatusCode.Conflict) {
+            if (error.details?.email.value === data.email) {
+                setError("email", {message: "Email already registered"});
+            }
+
+            if (error.details?.phone.value === data.phone) {
+                setError("phone", {message: "Number already registered"});
+            }
+            return;
+        }
+
+        toast.error(error?.message ?? "Unknown error");
     });
 
     return (
@@ -37,6 +63,16 @@ function SignupPage(): JSX.Element {
             footerLinkTo="/auth/login"
         >
             <form className="space-y-4" onSubmit={onSubmit}>
+                <InputField
+                    type="text"
+                    label="Name"
+                    autoComplete="name"
+                    register={register('name', {
+                        required: 'Name is required',
+                    })}
+                    error={errors.name}
+                />
+
                 <InputField
                     type="email"
                     label="Email"
@@ -50,6 +86,7 @@ function SignupPage(): JSX.Element {
                     })}
                     error={errors.email}
                 />
+
                 <InputField
                     type="tel"
                     label="Phone"

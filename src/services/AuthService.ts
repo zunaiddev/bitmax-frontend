@@ -41,10 +41,31 @@ class AuthService {
         }
     }
 
-    async verifyOtp(URI: string, email: string | undefined, phone: string | undefined, otp: string): Promise<ApiResponse> {
+    async verifyEmailOtp(email: string, otp: string): Promise<ApiResponse> {
+        return await this.#post("/auth/verify-email", {email, otp});
+    }
+
+    async verifyPhoneOtp(phone: string, otp: string): Promise<ApiResponse> {
+        return await this.#post("/auth/verify-phone", {phone, otp});
+    }
+
+    async requestLoginOtp(email: string): Promise<ApiResponse> {
+        return this.#post("/auth/request-login-otp", {email});
+    }
+
+    async loginWithOtp(email: string, otp: string): Promise<ApiResponse> {
+        return await this.#post("/auth/login-otp", {email, otp});
+    }
+
+    async signup(name: string, email: string, phone: string, password: string): Promise<ApiResponse> {
+        return await this.#post("/auth/register", {name, email, phone, password});
+    }
+
+
+    async #post(uri: string, data: unknown): Promise<ApiResponse> {
         try {
             const response =
-                await publicApi.post(`/auth/verify-${URI}`, {email, phone, otp});
+                await publicApi.post(uri, data);
             return ApiResponse.success(response.data);
         } catch (err) {
             if (axios.isAxiosError(err)) {
@@ -58,10 +79,6 @@ class AuthService {
                 details: err,
             });
         }
-    }
-
-    async loginWithOtp(): Promise<ApiResponse> {
-        return ApiResponse.success(null);
     }
 }
 

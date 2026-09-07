@@ -1,4 +1,4 @@
-import type {JSX} from 'react';
+import {type JSX, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, type NavigateFunction, useNavigate} from 'react-router-dom';
 import AuthFormContainer from "../components/AuthFormContainer.tsx";
@@ -17,24 +17,56 @@ function LoginPage(): JSX.Element {
     const {
         register,
         handleSubmit,
-        formState: {errors, isSubmitting,},
+        formState: {errors, isSubmitting},
         setError,
         resetField,
+        unregister
     } = useForm<LoginFormValues>({
         defaultValues: {
             email: "john2@gmail.com",
             password: "John@123"
         }
     });
+    const [withPassword, setWithPassword] = useState<boolean>(true);
+
     const navigate: NavigateFunction = useNavigate();
 
+    useEffect(() => {
+        if (!withPassword) {
+            unregister("password");
+        }
+    }, [unregister, withPassword]);
+
+    function toggleWithPassword(): void {
+        setWithPassword(!withPassword);
+    }
+
     async function onSubmit(data: LoginFormValues): Promise<void> {
+        if (!withPassword) {
+            const {success, error}: ApiResponse = await AuthService.requestLoginOtp(data.email);
+
+            if (success) {
+                toast.success("Otp Sent Successfully!");
+                navigate(`/auth/verify-email?email=${data.email}&skip=${true}&login=${true}`);
+                return;
+            }
+
+            if (error?.code === "NO_USER_FOUND") {
+                setError("email", {message: "Email is not registered."});
+                return;
+            }
+
+            toast.error(error?.message || "Unknown error");
+            return;
+        }
+
         const {success, payload, error}: ApiResponse = await AuthService.login(data.email, data.password);
 
         console.log(error);
 
         if (success) {
             localStorage.setItem("token", payload.accessToken);
+            localStorage.setItem("sessionId", payload.sessionId);
             toast.success("Login successful");
             navigate("/dashboard");
             return;
@@ -51,9 +83,9 @@ function LoginPage(): JSX.Element {
             const details = error.details;
 
             if (!details?.email?.verified) {
-                navigate(`/auth/verify-email?${details?.email?.value}`, {replace: true});
+                navigate(`/auth/verify-email?email=${details?.email?.value}`, {replace: true});
             } else {
-                navigate(`/auth/verify-phone?${details?.phone?.value}`, {replace: true});
+                navigate(`/auth/verify-phone?phone=${details?.phone?.value}`, {replace: true});
             }
 
             return;
@@ -102,7 +134,7 @@ function LoginPage(): JSX.Element {
                     })}
                     error={errors.email}
                 />
-                <InputField
+                {withPassword && <InputField
                     type="password"
                     label="Password"
                     autoComplete="current-password"
@@ -110,18 +142,25 @@ function LoginPage(): JSX.Element {
                         required: 'Password is required',
                     })}
                     error={errors.password}
-                />
+                />}
 
-                <div className="flex items-center justify-end text-sm text-white/60">
-                    <Link to="/auth/forgot-password" className="text-cyan-300 transition hover:text-cyan-200">
-                        Forgot password?
-                    </Link>
+                <div className="flex flex-col items-end gap-2 justify-end text-sm text-white/60">
+                    {withPassword &&
+                        <Link to="/auth/forgot-password" className="text-cyan-300 transition hover:text-cyan-200">
+                            Forgot password?
+                        </Link>}
+
+                    <button className="text-cyan-300 transition hover:text-cyan-200 cursor-pointer" type="button"
+                            onClick={toggleWithPassword}>
+                        Login with {withPassword ? "otp" : "password"}
+                    </button>
                 </div>
 
                 <Button type="submit" isSubmitting={isSubmitting}>
                     Sign in
                 </Button>
             </form>
+
         </AuthFormContainer>
     );
 }

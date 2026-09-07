@@ -1,22 +1,29 @@
 import {type RefObject, useEffect, useRef, useState} from "react";
 import AuthFormContainer from "../components/AuthFormContainer.tsx";
 import OtpComponent, {type OtpHandle} from "../components/OtpComponent.tsx";
-import {type Location, useLocation, useNavigate} from "react-router-dom";
+import {type Location, useLocation, useNavigate, useSearchParams} from "react-router-dom";
 import AuthService from "../services/AuthService.ts";
 import toast from "react-hot-toast";
 import SendingOtpLoader from "../components/SendingOtpLoader.tsx";
 
 function VerifyPhonePage() {
     const location: Location = useLocation();
-    const [phone] = useState<string>(location.search.substring(1));
-    const [sendingOtp, setSendingOtp] = useState<boolean>(true);
+    const [params] = useSearchParams();
+    const [phone] = useState<string | null>(params.get("phone"));
+    const [sendingOtp, setSendingOtp] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const fieldRef: RefObject<OtpHandle | null> = useRef<OtpHandle>(null);
     const navigate = useNavigate();
 
-
     useEffect(() => {
-        if (!phone) return;
+        const phone = params.get("phone");
+        const skip = params.get("skip") == "true";
+
+        if (skip) return;
+
+        if (!phone) {
+            return;
+        }
 
         (async function () {
             setSendingOtp(true);
@@ -31,11 +38,11 @@ function VerifyPhonePage() {
             toast.error(error?.message ?? "Unknown error");
         })();
 
-    }, [location, phone]);
+    }, [location, params]);
 
     async function handleSubmit(value: string): Promise<void> {
         setLoading(true);
-        const {success, payload, error} = await AuthService.verifyOtp("phone", undefined, phone, value);
+        const {success, payload, error} = await AuthService.verifyPhoneOtp(phone as string, value);
         setLoading(false);
 
         if (success) {
@@ -43,11 +50,12 @@ function VerifyPhonePage() {
 
             if (payload.accessToken) {
                 localStorage.setItem("token", payload.accessToken);
+                localStorage.setItem("sessionId", payload.sessionId);
                 navigate("/dashboard");
                 return;
             }
 
-            navigate("/auth/verify-phone");
+            navigate(`/auth/verify-email?email=${payload.email.value}&skip=${params.get("skip")}`);
 
             return;
         }

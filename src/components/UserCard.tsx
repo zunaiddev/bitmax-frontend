@@ -1,4 +1,6 @@
-import type {JSX} from "react";
+import {type JSX, useState} from "react";
+import UserService from "../services/UserService.ts";
+import {useNavigate} from "react-router-dom";
 
 interface Props {
     email: string;
@@ -7,8 +9,23 @@ interface Props {
 }
 
 function UserCard({email, phone, createdAt}: Props): JSX.Element {
-    function handleLogout() {
-        console.log("logout");
+    const [loggingOut, setLoggingOut] = useState(false);
+    const navigate = useNavigate();
+
+    async function handleLogout() {
+        const sessionId: string | null = localStorage.getItem("sessionId");
+        console.log(sessionId);
+
+        if (!sessionId) {
+            localStorage.clear();
+            navigate("/auth/login");
+        }
+
+        setLoggingOut(true);
+        await UserService.logout(sessionId as string);
+        setLoggingOut(false);
+
+        navigate("/auth/login");
     }
 
     return (<section
@@ -28,10 +45,11 @@ function UserCard({email, phone, createdAt}: Props): JSX.Element {
 
             <button
                 type="button"
+                disabled={loggingOut}
                 onClick={handleLogout}
                 className="rounded-2xl border border-rose-400/25 bg-rose-400/10 px-4 py-3 text-sm font-medium text-rose-200 transition hover:border-rose-300/40 hover:bg-rose-400/15 hover:text-rose-100"
             >
-                Logout
+                {loggingOut ? "Logging Out..." : "Logout"}
             </button>
         </div>
 

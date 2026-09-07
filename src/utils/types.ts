@@ -6,8 +6,8 @@ export interface AccountInfo {
 
 export interface DeviceSession {
     id: string;
-    device: string;
-    location: string;
-    lastSeen: string;
+    name: string;
+    ip: string;
+    type: string;
+    date: string;
 }
-

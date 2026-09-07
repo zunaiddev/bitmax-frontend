@@ -1,16 +1,22 @@
-import type {JSX} from "react";
+import {type JSX, useState} from "react";
 import type {DeviceSession} from "../utils/types.ts";
+import UserService from "../services/UserService.ts";
 
 
 interface Props {
     sessions: DeviceSession[];
+    deleteSession: (id: string) => void;
 }
 
-function SessionsCard({sessions}: Props): JSX.Element {
-    console.log(sessions);
+function SessionsCard({sessions, deleteSession}: Props): JSX.Element {
+    const [revoking, setRevoking] = useState<boolean>(false);
 
-    function handleRevoke(sessionId: string) {
-        console.log("revoke", sessionId);
+    async function handleRevoke(sessionId: string) {
+        setRevoking(true);
+        await UserService.logout(sessionId);
+        setRevoking(false);
+
+        deleteSession(sessionId);
     }
 
     return (<section
@@ -28,8 +34,12 @@ function SessionsCard({sessions}: Props): JSX.Element {
         </div>
 
         <div className="space-y-4">
-            {sessions.map((session) => (
-                <div
+            {sessions.map((session: DeviceSession) => {
+                if (session.id === localStorage.getItem("sessionId")) {
+                    return null;
+                }
+
+                return <div
                     key={session.id}
                     className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/15 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
                 >
@@ -41,6 +51,7 @@ function SessionsCard({sessions}: Props): JSX.Element {
                     </div>
 
                     <button
+                        disabled={revoking}
                         type="button"
                         onClick={() => handleRevoke(session.id)}
                         className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition hover:border-cyan-300/30 hover:bg-cyan-400/10 hover:text-cyan-100"
@@ -48,7 +59,7 @@ function SessionsCard({sessions}: Props): JSX.Element {
                         Revoke
                     </button>
                 </div>
-            ))}
+            })}
         </div>
     </section>);
 }
