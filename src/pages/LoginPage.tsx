@@ -97,6 +97,7 @@ function LoginPage(): JSX.Element {
         }
 
         if (code === "INVALID_PASSWORD") {
+            toast.error("Invalid password");
             setError("password", {message: "Invalid Password"});
             resetField("password");
             return;
