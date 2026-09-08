@@ -7,6 +7,7 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage.tsx";
 import DashboardPage from "../pages/DashboardPage.tsx";
 import VerifyEmailPage from "../pages/VerifyEmailPage.tsx";
 import VerifyPhonePage from "../pages/VerifyPhonePage.tsx";
+import ResetPassword from "../pages/ResetPassword.tsx";
 
 const router = createBrowserRouter([
     {
@@ -22,7 +23,8 @@ const router = createBrowserRouter([
                     {path: 'signup', element: <SignupPage/>},
                     {path: 'verify-email', element: <VerifyEmailPage/>},
                     {path: 'verify-phone', element: <VerifyPhonePage/>},
-                    {path: "forgot-password", element: <ForgotPasswordPage/>}
+                    {path: "forgot-password", element: <ForgotPasswordPage/>},
+                    {path: "reset-password", element: <ResetPassword/>}
                 ],
             },
             {path: "dashboard", element: <DashboardPage/>},

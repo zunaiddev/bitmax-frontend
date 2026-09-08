@@ -32,6 +32,13 @@ class AuthService {
         return await this.#post("/auth/register", {name, email, phone, password});
     }
 
+    async forgotPassword(email: string): Promise<ApiResponse> {
+        return await this.#post("/auth/forget-password", {email});
+    }
+
+    async resetPassword(token: string, password: string): Promise<ApiResponse> {
+        return await this.#post("/auth/reset-password", {token, password});
+    }
 
     async #post(uri: string, data: unknown, withCredentials: boolean = false): Promise<ApiResponse> {
         try {
