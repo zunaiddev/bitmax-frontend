@@ -3,7 +3,7 @@ import {publicApi} from "../api/api.ts";
 
 class AuthService {
     async login(email: string, password: string): Promise<ApiResponse> {
-        return await this.#post("/auth/login", {email, password});
+        return await this.#post("/auth/login", {email, password}, true);
     }
 
     async sendEmailOrPhoneOtp(email: string | undefined, phone: string | undefined): Promise<ApiResponse> {
@@ -13,11 +13,11 @@ class AuthService {
     }
 
     async verifyEmailOtp(email: string, otp: string): Promise<ApiResponse> {
-        return await this.#post("/auth/verify-email", {email, otp});
+        return await this.#post("/auth/verify-email", {email, otp}, true);
     }
 
     async verifyPhoneOtp(phone: string, otp: string): Promise<ApiResponse> {
-        return await this.#post("/auth/verify-phone", {phone, otp});
+        return await this.#post("/auth/verify-phone", {phone, otp}, true);
     }
 
     async requestLoginOtp(email: string): Promise<ApiResponse> {
@@ -25,7 +25,7 @@ class AuthService {
     }
 
     async loginWithOtp(email: string, otp: string): Promise<ApiResponse> {
-        return await this.#post("/auth/login-otp", {email, otp});
+        return await this.#post("/auth/login-otp", {email, otp}, true);
     }
 
     async signup(name: string, email: string, phone: string, password: string): Promise<ApiResponse> {
@@ -33,9 +33,9 @@ class AuthService {
     }
 
 
-    async #post(uri: string, data: unknown): Promise<ApiResponse> {
+    async #post(uri: string, data: unknown, withCredentials: boolean = false): Promise<ApiResponse> {
         try {
-            const response = await publicApi.post(uri, data);
+            const response = await publicApi.post(uri, data, {withCredentials});
             return ApiResponse.success(response.data);
         } catch (err: any) {
             return ApiResponse.error(err);

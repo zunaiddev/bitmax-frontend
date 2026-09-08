@@ -33,11 +33,9 @@ async function getToken(): Promise<string | null> {
 
     try {
         const response = await publicApi.post<RefreshResponse>(
-            "/auth/refresh",
+            "/auth/refresh-token",
             {sessionId},
-            {
-                withCredentials: true
-            }
+            {withCredentials: true}
         );
 
         const {accessToken, sessionId: newSessionId} = response.data;
