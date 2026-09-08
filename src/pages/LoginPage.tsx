@@ -23,7 +23,7 @@ function LoginPage(): JSX.Element {
         unregister
     } = useForm<LoginFormValues>({
         defaultValues: {
-            email: "john2@gmail.com",
+            email: "work87t@gmail.com",
             password: "John@123"
         }
     });

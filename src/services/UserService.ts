@@ -17,7 +17,7 @@ class UserService {
     }
 
     async #authenticatedGet(url: string): Promise<ApiResponse> {
-        const token = getToken();
+        const token = await getToken();
         if (!token) {
             return ApiResponse.error({
                 status: 0,

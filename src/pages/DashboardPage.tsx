@@ -10,27 +10,28 @@ import SessionsCard from "../components/SessionsCard.tsx";
 
 function DashboardPage(): JSX.Element | null {
     const [loading, setLoading] = useState<boolean>();
-    const [user, setUser] = useState<AccountInfo | null>(null);
+    const [user, setUser] = useState<AccountInfo>();
     const [sessions, setSessions] = useState<DeviceSession[]>([]);
 
     const navigate: NavigateFunction = useNavigate();
 
     useEffect(() => {
-        const token = getToken();
 
-        if (!token) {
-            navigate("/auth/login");
-            return;
-        }
 
         (async function () {
             setLoading(true);
+            const token = await getToken();
+
+            if (!token) {
+                navigate("/auth/login");
+                return;
+            }
+
             const [userResult, sessionsResult] = await Promise.all([
                 UserService.getUser(),
                 UserService.getSessions(),
             ]);
             setLoading(false);
-
 
             if (userResult.success) {
                 setUser(userResult.payload);
@@ -50,15 +51,11 @@ function DashboardPage(): JSX.Element | null {
         setSessions([...sessions.filter(value => value.id !== id)]);
     }
 
-    if (!user || sessions.length === 0) {
-        return null;
-    }
-
     return (
         <main
             className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.18),transparent_35%),linear-gradient(180deg,#050816_0%,#02050d_100%)] px-4 py-10 flex items-center justify-center text-white">
             <div className="mx-auto flex w-full h-full gap-5 flex-col">
-                {loading ? <><ProfileDetailsSkeleton/> <UserSessionsSkeleton/></> : <>
+                {loading || !user ? <><ProfileDetailsSkeleton/> <UserSessionsSkeleton/></> : <>
                     <UserCard name={user?.name} email={user?.email} phone={user?.phone} createdAt={user?.createdAt}/>
                     <SessionsCard sessions={sessions} deleteSession={removeSession}/>
                 </>}
