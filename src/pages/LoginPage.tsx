@@ -23,8 +23,8 @@ function LoginPage(): JSX.Element {
         unregister
     } = useForm<LoginFormValues>({
         defaultValues: {
-            email: "work87t@gmail.com",
-            password: "John@123"
+            email: "",
+            password: ""
         }
     });
     const [withPassword, setWithPassword] = useState<boolean>(true);

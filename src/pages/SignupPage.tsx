@@ -23,10 +23,10 @@ function SignupPage(): JSX.Element {
         setError,
     } = useForm<SignupFormValues>({
         defaultValues: {
-            name: 'John',
-            email: 'john@gmail.com',
-            phone: '9690578859',
-            password: 'John@123',
+            name: '',
+            email: '',
+            phone: '',
+            password: '',
         }
     });
     const navigate = useNavigate();
